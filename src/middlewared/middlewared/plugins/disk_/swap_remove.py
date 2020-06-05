@@ -2,13 +2,23 @@ import asyncio
 import os
 
 from middlewared.utils.osc import IS_LINUX
-from middlewared.service import lock, private, Service
+from middlewared.schema import Bool, Dict, List, Str
+from middlewared.service import accepts, lock, private, Service
 from middlewared.utils import run
 
 
 class DiskService(Service):
 
     @private
+    @accepts(
+        'swaps_remove_disks',
+        List('disks', default=[], items=[Str('disk')]),
+        Dict(
+            'swap_removal_options',
+            Bool('configure_swap', default=True),
+            register=True
+        )
+    )
     @lock('swaps_configure')
     async def swaps_remove_disks(self, disks, options=None):
         """
